@@ -1,36 +1,98 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Implement auth in nextjs
 
-## Getting Started
-
-First, run the development server:
+1. install the auth package
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install next-auth@beta
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. run the following cmd.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- It will generate `.env.local` and inside it variable `AUTH_SECRET`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npx auth secret
+```
 
-## Learn More
+3. Create OAuth app in github and copy envs from and paste it in `.env.local` file. Note- **The env variables name should be `AUTH_GITHUB_ID` and `AUTH_GITHUB_SECRET`.**
 
-To learn more about Next.js, take a look at the following resources:
+4. Create `api/auth/[...nextauth]/route.ts`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+5. Create a `auth.ts` file in root of application.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+_auth.ts_
 
-## Deploy on Vercel
+```typescript
+import NextAuth from "next-auth";
+import GitHub from "next-auth/providers/github";
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+export const { auth, handlers, signIn, signOut } = NextAuth({
+  providers: [GitHub],
+});
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+6. In `api/auth/[...nextauth]/route.ts`.
+
+_route.ts_
+
+```typescript
+import { handlers } from "../../../../../auth";
+
+export const { GET, POST } = handlers;
+```
+
+7. Just create UI where user will click to login and logout. but here comes problem. **signIn and signOut are server functions and `onClick` is client component. Nextjs will throw error here.**
+
+_refer this video -_ [video](https://www.youtube.com/watch?v=n-fVrzaikBQ) - On 10:01 timestamp.
+
+8. Create `src/lib/actions/auth.ts`.
+
+_auth.ts_
+
+```typescript
+"use server";
+
+import { signIn, signOut } from "../../../auth";
+
+export const login = async () => {
+  await signIn("github", { redirectTo: "/" });
+};
+
+export const logout = async () => {
+  await signOut({ redirectTo: "/" });
+};
+```
+
+9. In home page. i.e `app/page.tsx` add the below code
+
+```javascript
+"use client";
+import { login } from "@/lib/actions/auth";
+
+export default function Home() {
+  return (
+    <>
+      <div className="w-full flex justify-center items-center mt-7 text-blue-400 text-4xl">
+        Hello World
+      </div>
+      <div className="mt-5 w-full flex justify-center flex-col">
+        You are not signIn
+        <br />
+        {"   "}
+      </div>
+      <button
+        onClick={() => login()}
+        className="mt-1.5 cursor-pointer  bg-blue-500 text-xl"
+      >
+        Sign In with github
+      </button>
+    </>
+  );
+}
+```
+
+---
+
+#### Now just click button and you will done.
+
+---
