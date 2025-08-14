@@ -96,3 +96,55 @@ export default function Home() {
 #### Now just click button and you will done.
 
 ---
+
+10. But how do we check if we loggedIn?? **So now we will make some changes with files that we done with.**
+
+11. Since we need to render user name and image, we are going to use session of auth. but it is server function. So in home page (`/app/page.tsx`) what we have changes.
+
+_page.tsx_
+
+```javascript
+"use server";
+import { SignInButton } from "@/components/SignInButton";
+import { auth } from "../../auth";
+
+export default async function Home() {
+  const session = await auth();
+  console.log(session); // if loggedIn ? "user data" : "null"
+
+  return (
+    <>
+      <div className="w-full flex justify-center items-center mt-7 text-blue-400 text-4xl">
+        Hello World
+      </div>
+      <div className="mt-5 w-full flex justify-center flex-col">
+        You are not signIn
+        <br />
+        {"   "}
+      </div>
+      <SignInButton />
+    </>
+  );
+}
+```
+
+12. Also that button (login) is transfered to `src/components/SignInButton.tsx`.
+
+_SignInButton.tsx_
+
+```javascript
+"use client";
+
+import { login } from "@/lib/actions/auth";
+
+export const SignInButton = () => {
+  return (
+    <button
+      onClick={() => login()}
+      className="mt-1.5 cursor-pointer  bg-blue-500 text-xl"
+    >
+      Sign In with github
+    </button>
+  );
+};
+```
