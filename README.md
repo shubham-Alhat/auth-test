@@ -148,3 +148,5 @@ export const SignInButton = () => {
   );
 };
 ```
+
+## Also just change `lib/actions/auth.ts`. meaning just replace google or github. and you are done there.
