@@ -9,7 +9,7 @@ export const SignInButton = () => {
         onClick={() => login()}
         className="mt-1.5 cursor-pointer  bg-blue-500 text-xl"
       >
-        Sign In with github
+        Sign In with google
       </button>
     </>
   );
