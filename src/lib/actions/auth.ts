@@ -9,3 +9,11 @@ export const login = async () => {
 export const logout = async () => {
   await signOut({ redirectTo: "/" });
 };
+
+export const loginWithGoogle = async () => {
+  await signIn("google", { redirectTo: "/" });
+};
+
+export const logoutWithGoogle = async () => {
+  await signOut({ redirectTo: "/" });
+};
